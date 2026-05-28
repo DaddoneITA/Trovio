@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
         where: { userId: session.user.id },
       })
       if (user?.aiProvider && allCreds.length > 0) {
-        const matched = allCreds.find((c) => c.provider === user.aiProvider)
+        const matched = allCreds.find((c: any) => c.provider === user.aiProvider)
         if (matched) {
           credentials = [{ provider: matched.provider as any, apiKey: matched.apiKey }]
         }
