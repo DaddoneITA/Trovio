@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google'
 import './globals.css'
 import { ThemeProvider } from '@/components/ThemeProvider'
 import { SessionProvider } from '@/components/SessionProvider'
+import Script from 'next/script'
 
 const inter = Inter({
   subsets: ['latin'],
@@ -23,6 +24,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="it" suppressHydrationWarning>
+      <head>
+        <Script
+          src="https://embeds.iubenda.com/widgets/ec6c28fa-227e-447e-8a27-36b335386afd.js"
+          strategy="afterInteractive"
+        />
+      </head>
       <body className={`${inter.variable} font-sans antialiased`}>
         <ThemeProvider>
           <SessionProvider>
