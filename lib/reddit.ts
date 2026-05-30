@@ -17,7 +17,6 @@ export async function searchReddit(
   const results = await Promise.allSettled(
     subreddits.map(async (subreddit) => {
       const url = `https://www.reddit.com/r/${subreddit}/search.json?q=${encodeURIComponent(query)}&sort=new&limit=15&restrict_sr=true&t=${timeMapping[timeFilter]}`
-
       const res = await fetch(url, {
         headers: {
           'User-Agent': 'Mozilla/5.0 (compatible; Trovio/1.0)',
@@ -25,12 +24,10 @@ export async function searchReddit(
         },
         cache: 'no-store',
       })
-
       if (!res.ok) {
-        console.error(`Reddit error r/${subreddit}: ${res.status}`)
+        console.error(`Reddit r/${subreddit}: ${res.status}`)
         return []
       }
-
       const data = await res.json()
       return data?.data?.children || []
     })
