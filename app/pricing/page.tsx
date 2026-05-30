@@ -1,7 +1,10 @@
+'use client'
+
 import { Navbar } from '@/components/Navbar'
 import { Footer } from '@/components/Footer'
 import { Check, Zap, Crown, Building2 } from 'lucide-react'
 import Link from 'next/link'
+import { useState } from 'react'
 
 const plans = [
   {
@@ -19,6 +22,7 @@ const plans = [
     cta: 'Inizia gratis',
     href: '/dashboard',
     popular: false,
+    stripe: false,
   },
   {
     name: 'Pro',
@@ -36,14 +40,15 @@ const plans = [
       'Supporto prioritario',
     ],
     cta: 'Scegli Pro',
-    href: '/dashboard',
+    href: null,
     popular: true,
+    stripe: true,
   },
   {
     name: 'Agency',
     price: '€49',
     period: '/mese',
-    description: 'Per team e agenzie con più clienti.',
+    description: 'Prossimamente.',
     icon: Building2,
     features: [
       'Tutto di Pro incluso',
@@ -53,23 +58,35 @@ const plans = [
       'Monitoring su 10 keyword',
       'Multi-account (3 utenti)',
       'Export CSV dei lead',
-      'API access',
-      'Onboarding dedicato',
     ],
-    cta: 'Scegli Agency',
-    href: '/dashboard',
+    cta: 'In arrivo',
+    href: null,
     popular: false,
+    stripe: false,
+    disabled: true,
   },
 ]
 
 export default function PricingPage() {
+  const [loading, setLoading] = useState(false)
+
+  const handleProCheckout = async () => {
+    setLoading(true)
+    try {
+      const res = await fetch('/api/stripe/checkout', { method: 'POST' })
+      const data = await res.json()
+      if (data.url) window.location.href = data.url
+    } catch (e) {
+      console.error(e)
+    }
+    setLoading(false)
+  }
+
   return (
     <div className="min-h-screen">
       <Navbar />
-
       <section className="py-20 sm:py-28">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          {/* Header */}
           <div className="text-center mb-16">
             <h1 className="text-4xl sm:text-5xl font-bold mb-4">
               Piani semplici,{' '}
@@ -81,8 +98,6 @@ export default function PricingPage() {
               Scegli il piano perfetto per il tuo business. Upgrade o downgrade in qualsiasi momento.
             </p>
           </div>
-
-          {/* Plans grid */}
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-5xl mx-auto">
             {plans.map((plan) => {
               const Icon = plan.icon
@@ -100,7 +115,6 @@ export default function PricingPage() {
                       Più popolare
                     </div>
                   )}
-
                   <div className="mb-6">
                     <div className={`w-10 h-10 rounded-xl flex items-center justify-center mb-4 ${
                       plan.popular
@@ -112,12 +126,10 @@ export default function PricingPage() {
                     <h3 className="text-xl font-bold mb-1">{plan.name}</h3>
                     <p className="text-sm text-[var(--color-text-secondary)]">{plan.description}</p>
                   </div>
-
                   <div className="mb-6">
                     <span className="text-4xl font-extrabold">{plan.price}</span>
                     <span className="text-[var(--color-text-secondary)] text-sm ml-1">{plan.period}</span>
                   </div>
-
                   <ul className="space-y-3 mb-8">
                     {plan.features.map((feature) => (
                       <li key={feature} className="flex items-start gap-2.5">
@@ -126,24 +138,34 @@ export default function PricingPage() {
                       </li>
                     ))}
                   </ul>
-
-                  <Link
-                    href={plan.href}
-                    className={`block text-center w-full py-3 rounded-xl font-semibold text-sm transition-all duration-200 ${
-                      plan.popular
-                        ? 'bg-[var(--color-primary)] text-white hover:bg-[var(--color-primary-hover)] shadow-sm hover:shadow-md'
-                        : 'bg-[var(--color-bg-sidebar)] text-[var(--color-text)] hover:bg-[var(--color-border)]'
-                    }`}
-                  >
-                    {plan.cta}
-                  </Link>
+                  {plan.stripe ? (
+                    <button
+                      onClick={handleProCheckout}
+                      disabled={loading}
+                      className="block text-center w-full py-3 rounded-xl font-semibold text-sm transition-all duration-200 bg-[var(--color-primary)] text-white hover:bg-[var(--color-primary-hover)] shadow-sm hover:shadow-md disabled:opacity-50"
+                    >
+                      {loading ? 'Caricamento...' : plan.cta}
+                    </button>
+                  ) : (
+                    <Link
+                      href={plan.href || '#'}
+                      className={`block text-center w-full py-3 rounded-xl font-semibold text-sm transition-all duration-200 ${
+                        plan.disabled
+                          ? 'bg-[var(--color-border)] text-[var(--color-text-tertiary)] cursor-not-allowed'
+                          : plan.popular
+                          ? 'bg-[var(--color-primary)] text-white hover:bg-[var(--color-primary-hover)]'
+                          : 'bg-[var(--color-bg-sidebar)] text-[var(--color-text)] hover:bg-[var(--color-border)]'
+                      }`}
+                    >
+                      {plan.cta}
+                    </Link>
+                  )}
                 </div>
               )
             })}
           </div>
         </div>
       </section>
-
       <Footer />
     </div>
   )
