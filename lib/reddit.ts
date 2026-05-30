@@ -3,11 +3,10 @@ import { Lead, TimeFilter } from './types'
 export async function searchReddit(
   query: string,
   subreddits: string[],
-  timeFilter: TimeFilter
-): Promise<Lead[]> {
-  const openaiKey = process.env.OPENAI_API_KEY
-
-  if (!openaiKey) {
+  timeFilter: TimeFilter,
+  apiKey: string | null
+) {
+  if (!apiKey) {
     console.error('No OpenAI key found')
     return []
   }
@@ -18,7 +17,7 @@ export async function searchReddit(
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      'Authorization': `Bearer ${openaiKey}`,
+      'Authorization': `Bearer ${apiKey}`,
     },
     body: JSON.stringify({
       model: 'gpt-4o-search-preview',
