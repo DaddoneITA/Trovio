@@ -6,44 +6,57 @@ export async function searchReddit(
   timeFilter: TimeFilter,
   apiKey: string | null
 ): Promise<Lead[]> {
-  const openaiKey = apiKey || process.env.OPENAI_API_KEY || null
-
-  if (!openaiKey) {
-    console.error('No OpenAI key found')
-    return []
+  const timeMapping: Record<TimeFilter, string> = {
+    '24h': 'day',
+    week: 'week',
+    month: 'month',
   }
 
-  const timeLabel =
-    timeFilter === '24h' ? 'last 24 hours' :
-    timeFilter === 'week' ? 'last week' : 'last month'
+  const now = Date.now() / 1000
 
-  const response = await fetch('https://api.openai.com/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Authorization': `Bearer ${openaiKey}`,
-    },
-    body: JSON.stringify({
-      model: 'gpt-4o-search-preview',
-      web_search_options: {},
-      messages: [{
-        role: 'user',
-        content: `Search Reddit for people looking to hire or needing help with "${query}" posted in the ${timeLabel}. Search in: ${subreddits.join(', ')}. Return ONLY a valid JSON array, no markdown. Each object: id (string), title (string), url (full reddit URL), subreddit (string), author (string), body (max 200 chars), createdAt (unix timestamp), isNew (boolean). Find 8-15 results.`
-      }]
+  const results = await Promise.allSettled(
+    subreddits.map(async (subreddit) => {
+      const url = `https://www.reddit.com/r/${subreddit}/search.json?q=${encodeURIComponent(query)}&sort=new&limit=15&restrict_sr=true&t=${timeMapping[timeFilter]}`
+
+      const res = await fetch(url, {
+        headers: {
+          'User-Agent': 'Mozilla/5.0 (compatible; Trovio/1.0)',
+          'Accept': 'application/json',
+        },
+        cache: 'no-store',
+      })
+
+      if (!res.ok) {
+        console.error(`Reddit error r/${subreddit}: ${res.status}`)
+        return []
+      }
+
+      const data = await res.json()
+      return data?.data?.children || []
     })
-  })
+  )
 
-  const data = await response.json()
-  const text = data.choices?.[0]?.message?.content || ''
+  const seen = new Set<string>()
+  const leads: Lead[] = []
 
-  try {
-    const clean = text.replace(/```json|```/g, '').trim()
-    const start = clean.indexOf('[')
-    const end = clean.lastIndexOf(']')
-    if (start === -1 || end === -1) return []
-    return JSON.parse(clean.substring(start, end + 1))
-  } catch {
-    console.error('Parse error:', text)
-    return []
+  for (const result of results) {
+    if (result.status !== 'fulfilled') continue
+    for (const post of result.value) {
+      const d = post.data
+      if (!d || seen.has(d.id)) continue
+      seen.add(d.id)
+      leads.push({
+        id: d.id,
+        title: d.title || '',
+        body: d.selftext?.substring(0, 500) || '',
+        subreddit: d.subreddit,
+        author: d.author,
+        url: `https://reddit.com${d.permalink}`,
+        createdAt: d.created_utc,
+        isNew: now - d.created_utc < 86400,
+      })
+    }
   }
+
+  return leads.sort((a, b) => b.createdAt - a.createdAt)
 }
