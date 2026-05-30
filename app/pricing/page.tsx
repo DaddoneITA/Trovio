@@ -11,9 +11,9 @@ const plans = [
     description: 'Perfetto per iniziare a testare Trovio.',
     icon: Zap,
     features: [
-      '10 ricerche al mese',
-      '5 messaggi generati al mese',
-      'Salvataggio lead base',
+      '5 ricerche al mese',
+      '3 messaggi generati al mese',
+      'Solo Reddit',
       'Accesso a 8 subreddit',
     ],
     cta: 'Inizia gratis',
@@ -27,8 +27,9 @@ const plans = [
     description: 'Per freelancer seri che vogliono crescere.',
     icon: Crown,
     features: [
-      'Ricerche illimitate',
+      '300 ricerche al mese',
       '100 messaggi al mese',
+      'Solo Reddit (LinkedIn in arrivo)',
       'Monitoring automatico (3 keyword)',
       'Email digest giornaliera',
       'Salvataggio lead illimitato',
@@ -46,7 +47,9 @@ const plans = [
     icon: Building2,
     features: [
       'Tutto di Pro incluso',
+      '1000 ricerche al mese',
       'Messaggi illimitati',
+      'Reddit + LinkedIn (in arrivo)',
       'Monitoring su 10 keyword',
       'Multi-account (3 utenti)',
       'Export CSV dei lead',
