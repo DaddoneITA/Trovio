@@ -1,10 +1,9 @@
 'use client'
-
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { signOut, useSession } from 'next-auth/react'
 import { cn } from '@/lib/utils'
-import { Search, Bookmark, History, Settings, Zap, TrendingUp, LogOut } from 'lucide-react'
+import { Search, Bookmark, History, Settings, Zap, TrendingUp, LogOut, Crown } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { getMonthlyLeadCount, getMonthlyMessageCount, getSavedLeads } from '@/lib/storage'
 
@@ -56,7 +55,6 @@ export function DashboardSidebar() {
           )
         })}
       </nav>
-
       <div className="p-4 border-t border-[var(--color-border)] space-y-3">
         <div className="bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-light)] rounded-xl p-4 text-white">
           <div className="flex items-center gap-2 mb-3">
@@ -74,7 +72,13 @@ export function DashboardSidebar() {
             </div>
           </div>
         </div>
-
+        <Link
+          href="/pricing"
+          className="flex items-center gap-3 px-3 py-2.5 w-full rounded-lg text-sm font-medium bg-amber-50 text-amber-700 hover:bg-amber-100 dark:bg-amber-950/20 dark:text-amber-400 transition-all"
+        >
+          <Crown className="w-4 h-4" />
+          Upgrade a Pro
+        </Link>
         {session?.user && (
           <button
             onClick={() => signOut({ callbackUrl: '/' })}
