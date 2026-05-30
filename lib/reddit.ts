@@ -5,59 +5,44 @@ export async function searchReddit(
   subreddits: string[],
   timeFilter: TimeFilter
 ): Promise<Lead[]> {
-  const searchTerms = `${query} (hiring OR need OR "looking for" OR freelancer)`
-  const seenIds = new Set<string>()
-  const timeMapping: Record<TimeFilter, string> = {
-    '24h': 'day',
-    week: 'week',
-    month: 'month',
-  }
-  const now = Date.now() / 1000
-  const minTimestamp: Record<TimeFilter, number> = {
-    '24h': now - 86400,
-    week: now - 604800,
-    month: now - 2592000,
+  const openaiKey = process.env.OPENAI_API_KEY
+
+  if (!openaiKey) {
+    console.error('No OpenAI key found')
+    return []
   }
 
-  const results = await Promise.allSettled(
-    subreddits.map(async (subreddit) => {
-      const params = new URLSearchParams({
-        q: searchTerms,
-        sort: 'new',
-        limit: '10',
-        restrict_sr: 'true',
-        t: timeMapping[timeFilter],
-      })
-      const url = `https://www.reddit.com/r/${subreddit}/search.json?${params}`
-      const response = await fetch(url, {
-        headers: { 'User-Agent': 'Trovio/1.0' },
-      })
-      if (!response.ok) return []
-      const data = await response.json()
-      return data?.data?.children || []
+  const timeLabel = timeFilter === '24h' ? 'last 24 hours' : timeFilter === 'week' ? 'last week' : 'last month'
+
+  const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${openaiKey}`,
+    },
+    body: JSON.stringify({
+      model: 'gpt-4o-search-preview',
+      messages: [
+        {
+          role: 'user',
+          content: `Search Reddit for people looking to hire or needing help with "${query}" posted in the ${timeLabel}. Search in these subreddits: ${subreddits.join(', ')}. Return ONLY a valid JSON array, no markdown. Each object must have: id (string), title (string), url (full reddit URL), subreddit (string), author (string), body (brief description max 200 chars), createdAt (unix timestamp approximate), isNew (boolean, true if posted in last 24h). Find 8-15 real results.`
+        }
+      ],
+      web_search_options: {}
     })
-  )
+  })
 
-  const allLeads: Lead[] = []
-  for (const result of results) {
-    if (result.status !== 'fulfilled') continue
-    for (const post of result.value) {
-      const d = post.data
-      if (!d || seenIds.has(d.id)) continue
-      if (d.created_utc < minTimestamp[timeFilter]) continue
-      seenIds.add(d.id)
-      allLeads.push({
-        id: d.id,
-        title: d.title || '',
-        body: d.selftext?.substring(0, 500) || '',
-        subreddit: d.subreddit,
-        author: d.author,
-        url: `https://reddit.com${d.permalink}`,
-        createdAt: d.created_utc,
-        isNew: now - d.created_utc < 86400,
-      })
-    }
+  const data = await response.json()
+  const text = data.choices?.[0]?.message?.content || ''
+
+  try {
+    const clean = text.replace(/```json|```/g, '').trim()
+    const start = clean.indexOf('[')
+    const end = clean.lastIndexOf(']')
+    if (start === -1 || end === -1) return []
+    return JSON.parse(clean.substring(start, end + 1))
+  } catch {
+    console.error('Parse error:', text)
+    return []
   }
-
-  return allLeads.sort((a, b) => b.createdAt - a.createdAt)
 }
