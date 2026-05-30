@@ -13,9 +13,9 @@ export async function searchReddit(
   }
 
   const timeMapping: Record<TimeFilter, string> = {
-    '24h': 'd',
-    week: 'w',
-    month: 'm',
+    '24h': 'w',
+    week: 'm',
+    month: 'y',
   }
 
   const subredditQuery = subreddits.map(s => `subreddit:${s}`).join(' OR ')
