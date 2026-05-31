@@ -18,13 +18,10 @@ export async function searchReddit(
     month: 'y',
   }
 
-  const subredditQuery = subreddits.map(s => `subreddit:${s}`).join(' OR ')
-  const fullQuery = `(${subredditQuery}) ${query}`
-
+  const fullQuery = `site:reddit.com ${query}`
   const url = `https://serpapi.com/search.json?engine=google&q=${encodeURIComponent(fullQuery)}&tbs=qdr:${timeMapping[timeFilter]}&num=20&api_key=${serpKey}`
 
   const res = await fetch(url, { cache: 'no-store' })
-
   if (!res.ok) {
     console.error(`SerpAPI error: ${res.status}`)
     return []
@@ -32,7 +29,6 @@ export async function searchReddit(
 
   const data = await res.json()
   const results = data.organic_results || []
-
   console.log(`SerpAPI: found ${results.length} results`)
 
   const now = Date.now() / 1000
@@ -40,10 +36,9 @@ export async function searchReddit(
 
   for (const item of results) {
     if (!item.link?.includes('reddit.com')) continue
-
     const subredditMatch = item.link.match(/reddit\.com\/r\/(\w+)/)
     const subreddit = subredditMatch?.[1] || 'reddit'
-
+    if (subreddits.length > 0 && !subreddits.map(s => s.toLowerCase()).includes(subreddit.toLowerCase())) continue
     leads.push({
       id: item.position?.toString() || Math.random().toString(),
       title: item.title || '',
