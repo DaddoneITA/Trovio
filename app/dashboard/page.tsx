@@ -34,12 +34,18 @@ export default function DashboardPage() {
         }),
       })
 
+      const data = await response.json()
+
+      if (response.status === 403 && data.error === 'LIMIT_REACHED') {
+        setError(`LIMIT_REACHED:${data.plan}:${data.used}:${data.limit}`)
+        setLeads([])
+        return
+      }
+
       if (!response.ok) throw new Error('Search failed')
 
-      const data = await response.json()
       setLeads(data.leads)
 
-      // Save to history
       addSearchHistory({
         query: searchQuery,
         resultsCount: data.totalFound,
@@ -48,7 +54,6 @@ export default function DashboardPage() {
         timestamp: Date.now(),
       })
 
-      // Update monthly counter
       addMonthlyLeadCount(data.totalFound)
     } catch (err) {
       setError('Errore durante la ricerca. Reddit potrebbe limitare le richieste. Riprova tra qualche secondo.')
@@ -60,7 +65,6 @@ export default function DashboardPage() {
 
   return (
     <div className="p-6 lg:p-8 max-w-4xl">
-      {/* Header */}
       <div className="mb-8">
         <h1 className="text-2xl font-bold mb-2">Cerca lead</h1>
         <p className="text-[var(--color-text-secondary)]">
@@ -68,12 +72,10 @@ export default function DashboardPage() {
         </p>
       </div>
 
-      {/* Search */}
       <div className="mb-6">
         <SearchBar onSearch={handleSearch} isLoading={isLoading} />
       </div>
 
-      {/* Filters */}
       <div className="mb-8">
         <FilterPanel
           selectedSubreddits={selectedSubreddits}
@@ -83,9 +85,25 @@ export default function DashboardPage() {
         />
       </div>
 
-      {/* Results */}
-      {error && (
-        <div className="flex items-center gap-3 p-4 rounded-xl bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-800 mb-6 animate-fade-in">
+      {error && error.startsWith('LIMIT_REACHED') && (
+        <div className="flex items-center justify-between p-4 rounded-xl bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 mb-6">
+          <div className="flex items-center gap-3">
+            <AlertCircle className="w-5 h-5 text-amber-500 flex-shrink-0" />
+            <div>
+              <p className="text-sm font-semibold text-amber-700 dark:text-amber-400">Hai esaurito le ricerche del mese</p>
+              <p className="text-xs text-amber-600 dark:text-amber-500">
+                Piano Free: {error.split(':')[2]}/{error.split(':')[3]} ricerche usate. Passa a Pro per 200 ricerche/mese.
+              </p>
+            </div>
+          </div>
+          <a href="/pricing" className="flex-shrink-0 px-4 py-2 rounded-lg bg-amber-500 text-white text-sm font-semibold hover:bg-amber-600 transition-all">
+            Passa a Pro →
+          </a>
+        </div>
+      )}
+
+      {error && !error.startsWith('LIMIT_REACHED') && (
+        <div className="flex items-center gap-3 p-4 rounded-xl bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-800 mb-6">
           <AlertCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
           <p className="text-sm text-red-700 dark:text-red-400">{error}</p>
         </div>
