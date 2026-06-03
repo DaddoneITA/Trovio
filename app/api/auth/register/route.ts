@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 import bcrypt from 'bcryptjs'
+import { sendWelcomeEmail } from '@/lib/email'
 
 export async function POST(request: NextRequest) {
   try {
@@ -29,7 +30,6 @@ export async function POST(request: NextRequest) {
     }
 
     const passwordHash = await bcrypt.hash(password, 12)
-
     await prisma.user.create({
       data: {
         email,
@@ -37,6 +37,9 @@ export async function POST(request: NextRequest) {
         passwordHash,
       },
     })
+
+    // Invia email di benvenuto
+    await sendWelcomeEmail(email, name || 'freelancer')
 
     return NextResponse.json({ success: true })
   } catch (error) {
