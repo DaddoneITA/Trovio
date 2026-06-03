@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation'
 import { useTheme } from 'next-themes'
 import { useSession, signOut } from 'next-auth/react'
 import { useState, useEffect } from 'react'
-import { Sun, Moon, Menu, X, Zap, LogOut, User } from 'lucide-react'
+import { Sun, Moon, Menu, X, Zap, LogOut, Settings, Crown } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 export function Navbar() {
@@ -38,9 +38,7 @@ export function Navbar() {
             <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[var(--color-primary)] to-[var(--color-primary-light)] flex items-center justify-center transition-transform group-hover:scale-110">
               <Zap className="w-4 h-4 text-white" />
             </div>
-            <span className="text-xl font-bold tracking-tight">
-              Trovio
-            </span>
+            <span className="text-xl font-bold tracking-tight">Trovio</span>
           </Link>
 
           <div className="hidden md:flex items-center gap-1">
@@ -82,59 +80,4 @@ export function Navbar() {
             ) : !isDashboard ? (
               <Link
                 href="/login"
-                className="hidden sm:inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[var(--color-primary)] text-white text-sm font-medium hover:bg-[var(--color-primary-hover)] transition-all duration-200 shadow-sm hover:shadow-md"
-              >
-                Inizia gratis
-              </Link>
-            ) : null}
-
-            <button
-              onClick={() => setMobileOpen(!mobileOpen)}
-              className="md:hidden p-2 rounded-lg text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-sidebar)] transition-all"
-            >
-              {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-            </button>
-          </div>
-        </div>
-
-        {mobileOpen && (
-          <div className="md:hidden py-3 border-t border-[var(--color-border)] animate-fade-in">
-            {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                onClick={() => setMobileOpen(false)}
-                className={cn(
-                  'block px-4 py-2.5 rounded-lg text-sm font-medium transition-all',
-                  pathname === link.href
-                    ? 'bg-[var(--color-primary-subtle)] text-[var(--color-primary)]'
-                    : 'text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-sidebar)]'
-                )}
-              >
-                {link.label}
-              </Link>
-            ))}
-            {isDashboard && session?.user && (
-              <button
-                onClick={() => { signOut({ callbackUrl: '/' }); setMobileOpen(false) }}
-                className="block w-full mt-2 px-4 py-2.5 rounded-lg text-sm font-medium text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 text-left"
-              >
-                <LogOut className="w-4 h-4 inline mr-2" />
-                Esci
-              </button>
-            )}
-            {!isDashboard && (
-              <Link
-                href="/login"
-                onClick={() => setMobileOpen(false)}
-                className="block mt-2 mx-4 text-center px-4 py-2.5 rounded-lg bg-[var(--color-primary)] text-white text-sm font-medium"
-              >
-                Inizia gratis
-              </Link>
-            )}
-          </div>
-        )}
-      </nav>
-    </header>
-  )
-}
+                className="hidden sm:inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[var(--color-primary)] text-white text-
