@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
         quantity: 1,
       }],
       customer_email: session.user.email,
-      success_url: `${process.env.NEXTAUTH_URL}/dashboard?upgraded=true`,
+      success_url: `${process.env.NEXTAUTH_URL}/dashboard/upgrade-success`,
       cancel_url: `${process.env.NEXTAUTH_URL}/pricing`,
     })
 
