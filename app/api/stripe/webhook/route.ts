@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import Stripe from 'stripe'
-import { db } from '@/lib/db'
+import { prisma } from '@/lib/db'
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
   apiVersion: '2025-04-30.basil',
@@ -29,7 +29,7 @@ export async function POST(request: NextRequest) {
       const email = session.customer_email
 
       if (email) {
-        await db.user.update({
+        await prisma.user.update({
           where: { email },
           data: { plan: 'pro' },
         })
@@ -42,7 +42,7 @@ export async function POST(request: NextRequest) {
       const customer = await stripe.customers.retrieve(subscription.customer as string)
 
       if ('email' in customer && customer.email) {
-        await db.user.update({
+        await prisma.user.update({
           where: { email: customer.email },
           data: { plan: 'free' },
         })
