@@ -80,4 +80,4 @@ export function Navbar() {
             ) : !isDashboard ? (
               <Link
                 href="/login"
-                className="hidden sm:inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[var(--color-primary)] text-white text-
+className="hidden sm:inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[var(--color-primary)] text-white text-sm font-medium hover:bg-[var(--color-primary-hover)] transition-all duration-200 shadow-sm hover:shadow-md"
