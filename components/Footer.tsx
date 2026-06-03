@@ -33,7 +33,7 @@ export function Footer() {
                 <a href="https://www.iubenda.com/privacy-policy/52771181" className="iubenda-white iubenda-noiframe iubenda-embed text-sm" title="Privacy Policy">Privacy Policy</a>
               </li>
               <li>
-                <a href="#" className="text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-text)] transition-colors">Termini di Servizio</a>
+                <a href="/termini#" className="text-sm text-[var(--color-text-secondary)] hover:text-[var(--color-text)] transition-colors">Termini di Servizio</a>
               </li>
             </ul>
           </div>
