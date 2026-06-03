@@ -80,4 +80,86 @@ export function Navbar() {
             ) : !isDashboard ? (
               <Link
                 href="/login"
-className="hidden sm:inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[var(--color-primary)] text-white text-sm font-medium hover:bg-[var(--color-primary-hover)] transition-all duration-200 shadow-sm hover:shadow-md"
+                className="hidden sm:inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-[var(--color-primary)] text-white text-sm font-medium hover:bg-[var(--color-primary-hover)] transition-all duration-200 shadow-sm hover:shadow-md"
+              >
+                Inizia gratis
+              </Link>
+            ) : null}
+
+            <button
+              onClick={() => setMobileOpen(!mobileOpen)}
+              className="md:hidden p-2 rounded-lg text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-sidebar)] transition-all"
+            >
+              {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </button>
+          </div>
+        </div>
+
+        {mobileOpen && (
+          <div className="md:hidden py-3 border-t border-[var(--color-border)] animate-fade-in">
+            {navLinks.map((link) => (
+              <Link
+                key={link.href}
+                href={link.href}
+                onClick={() => setMobileOpen(false)}
+                className={cn(
+                  'block px-4 py-2.5 rounded-lg text-sm font-medium transition-all',
+                  pathname === link.href
+                    ? 'bg-[var(--color-primary-subtle)] text-[var(--color-primary)]'
+                    : 'text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-sidebar)]'
+                )}
+              >
+                {link.label}
+              </Link>
+            ))}
+
+            {isDashboard && (
+              <>
+                <Link
+                  href="/dashboard/settings"
+                  onClick={() => setMobileOpen(false)}
+                  className={cn(
+                    'flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium transition-all',
+                    pathname === '/dashboard/settings'
+                      ? 'bg-[var(--color-primary-subtle)] text-[var(--color-primary)]'
+                      : 'text-[var(--color-text-secondary)] hover:bg-[var(--color-bg-sidebar)]'
+                  )}
+                >
+                  <Settings className="w-4 h-4" />
+                  Impostazioni
+                </Link>
+
+                <Link
+                  href="/pricing"
+                  onClick={() => setMobileOpen(false)}
+                  className="flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-medium text-amber-600 hover:bg-amber-50 dark:hover:bg-amber-950/20 transition-all"
+                >
+                  <Crown className="w-4 h-4" />
+                  Upgrade a Pro
+                </Link>
+
+                <button
+                  onClick={() => { signOut({ callbackUrl: '/' }); setMobileOpen(false) }}
+                  className="flex items-center gap-2 w-full mt-1 px-4 py-2.5 rounded-lg text-sm font-medium text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 text-left transition-all"
+                >
+                  <LogOut className="w-4 h-4" />
+                  Esci
+                </button>
+              </>
+            )}
+
+            {!isDashboard && (
+              <Link
+                href="/login"
+                onClick={() => setMobileOpen(false)}
+                className="block mt-2 mx-4 text-center px-4 py-2.5 rounded-lg bg-[var(--color-primary)] text-white text-sm font-medium"
+              >
+                Inizia gratis
+              </Link>
+            )}
+          </div>
+        )}
+      </nav>
+    </header>
+  )
+}
