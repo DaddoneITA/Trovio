@@ -1,5 +1,33 @@
 import { Lead, TimeFilter } from '@/lib/types'
 
+function buildQuery(query: string): string {
+  const q = query.trim().toLowerCase()
+  
+  // Aggiungi varianti comuni
+  const variants: string[] = [query]
+  
+  if (!q.endsWith('er') && !q.endsWith('ist')) {
+    variants.push(query + 'er')
+  }
+  if (q.endsWith('design')) {
+    variants.push(query.replace('design', 'designer'))
+  }
+  if (q.endsWith('develop')) {
+    variants.push(query.replace('develop', 'developer'))
+  }
+  if (q.endsWith('write') || q.endsWith('writing')) {
+    variants.push('writer', 'copywriter')
+  }
+
+  const intentKeywords = 'hiring OR "looking for" OR "need a" OR "need help" OR "help wanted" OR "seeking" OR "freelancer"'
+  
+  const variantQuery = variants.length > 1 
+    ? `(${variants.map(v => `"${v}"`).join(' OR ')})` 
+    : `"${query}"`
+
+  return `site:reddit.com ${variantQuery} ${intentKeywords}`
+}
+
 export async function searchReddit(
   query: string,
   subreddits: string[],
@@ -12,7 +40,9 @@ export async function searchReddit(
     return []
   }
 
-  const fullQuery = `site:reddit.com ${query}`
+  const fullQuery = buildQuery(query)
+  console.log('Search query:', fullQuery)
+
   const url = `https://serpapi.com/search.json?engine=google&q=${encodeURIComponent(fullQuery)}&tbs=qdr:y&num=20&api_key=${serpKey}`
 
   const res = await fetch(url, { cache: 'no-store' })
@@ -40,16 +70,17 @@ export async function searchReddit(
     const subredditMatch = item.link.match(/reddit\.com\/r\/(\w+)/)
     const subreddit = subredditMatch?.[1] || 'reddit'
 
-    if (subreddits.length > 0 && !subreddits.map(s => s.toLowerCase()).includes(subreddit.toLowerCase())) continue
+    if (
+      subreddits.length > 0 &&
+      !subreddits.map(s => s.toLowerCase()).includes(subreddit.toLowerCase())
+    ) continue
 
-    // Prova a parsare la data reale da SerpAPI
     let createdAt = now - 86400 * 7
     if (item.date) {
       const parsed = Date.parse(item.date)
       if (!isNaN(parsed)) createdAt = parsed / 1000
     }
 
-    // Filtra per periodo selezionato
     if (createdAt < timeThreshold[timeFilter]) continue
 
     leads.push({
