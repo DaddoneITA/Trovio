@@ -1,3 +1,5 @@
+export type LeadIntent = 'HIGH' | 'MEDIUM' | 'LOW'
+
 export type Lead = {
   id: string
   title: string
@@ -7,6 +9,15 @@ export type Lead = {
   url: string
   createdAt: number
   isNew: boolean
+  // AI enrichment (Groq)
+  intent?: LeadIntent
+  score?: number
+  score_reason?: string
+  category?: string
+  client_type?: 'freelance' | 'agency' | 'business'
+  summary?: string
+  keywords?: string[]
+  outreach_message?: string
 }
 
 export type SavedLead = Lead & {
