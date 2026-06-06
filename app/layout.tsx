@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google'
 import './globals.css'
 import { ThemeProvider } from '@/components/ThemeProvider'
 import { SessionProvider } from '@/components/SessionProvider'
+import { PostHogProvider } from '@/components/PostHogProvider'
 import Script from 'next/script'
 
 const inter = Inter({
@@ -31,11 +32,13 @@ export default function RootLayout({
         />
       </head>
       <body className={`${inter.variable} font-sans antialiased`}>
-        <ThemeProvider>
-          <SessionProvider>
-            {children}
-          </SessionProvider>
-        </ThemeProvider>
+        <PostHogProvider>
+          <ThemeProvider>
+            <SessionProvider>
+              {children}
+            </SessionProvider>
+          </ThemeProvider>
+        </PostHogProvider>
       </body>
     </html>
   )
