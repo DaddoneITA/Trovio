@@ -7,8 +7,10 @@ import { LeadCard } from '@/components/LeadCard'
 import { Lead, SUBREDDITS, TimeFilter } from '@/lib/types'
 import { addSearchHistory, addMonthlyLeadCount } from '@/lib/storage'
 import { Search, AlertCircle, ArrowRight } from 'lucide-react'
+import { useTracking } from '@/lib/useTracking'
 
 export default function DashboardPage() {
+  const { trackSearch, trackUpgradeClicked } = useTracking()
   const [leads, setLeads] = useState<Lead[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [query, setQuery] = useState('')
@@ -38,6 +40,7 @@ export default function DashboardPage() {
 
       if (response.status === 403 && data.error === 'LIMIT_REACHED') {
         setError(`LIMIT_REACHED:${data.plan}:${data.used}:${data.limit}`)
+        trackUpgradeClicked('search_limit', data.plan)
         setLeads([])
         return
       }
@@ -45,6 +48,7 @@ export default function DashboardPage() {
       if (!response.ok) throw new Error('Search failed')
 
       setLeads(data.leads)
+      trackSearch(searchQuery, data.usage?.plan || 'free', data.totalFound)
 
       addSearchHistory({
         query: searchQuery,
@@ -96,7 +100,7 @@ export default function DashboardPage() {
               </p>
             </div>
           </div>
-          <a href="/pricing" className="flex-shrink-0 px-4 py-2 rounded-lg bg-amber-500 text-white text-sm font-semibold hover:bg-amber-600 transition-all">
+          <a href="/pricing" onClick={() => trackUpgradeClicked('banner', 'free')} className="flex-shrink-0 px-4 py-2 rounded-lg bg-amber-500 text-white text-sm font-semibold hover:bg-amber-600 transition-all">
             Passa a Pro →
           </a>
         </div>

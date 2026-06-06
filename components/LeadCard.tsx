@@ -6,6 +6,7 @@ import { timeAgo } from '@/lib/utils'
 import { saveLead, removeSavedLead, isLeadSaved } from '@/lib/storage'
 import { ExternalLink, Sparkles, Bookmark, BookmarkCheck } from 'lucide-react'
 import { MessageBox } from './MessageBox'
+import { useTracking } from '@/lib/useTracking'
 
 interface LeadCardProps {
   lead: Lead
@@ -14,6 +15,7 @@ interface LeadCardProps {
 }
 
 export function LeadCard({ lead, service, animationDelay = 0 }: LeadCardProps) {
+  const { trackLeadSaved, trackOutreachCopied } = useTracking()
   const [showMessage, setShowMessage] = useState(false)
   const [saved, setSaved] = useState(false)
 
@@ -28,6 +30,7 @@ export function LeadCard({ lead, service, animationDelay = 0 }: LeadCardProps) {
     } else {
       saveLead(lead)
       setSaved(true)
+      trackLeadSaved(lead.id, lead.subreddit, lead.score)
     }
   }
 
@@ -81,7 +84,10 @@ export function LeadCard({ lead, service, animationDelay = 0 }: LeadCardProps) {
           Apri post
         </a>
         <button
-          onClick={() => setShowMessage(!showMessage)}
+          onClick={() => {
+            setShowMessage(!showMessage)
+            if (!showMessage) trackOutreachCopied(lead.id, lead.score)
+          }}
           className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium bg-[var(--color-primary)] text-white hover:bg-[var(--color-primary-hover)] transition-all duration-200 shadow-sm hover:shadow-md"
         >
           <Sparkles className="w-3.5 h-3.5" />
