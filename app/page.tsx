@@ -40,9 +40,9 @@ const steps = [
 ]
 
 const stats = [
-  { icon: Users, value: '2,500+', label: 'Freelancer attivi' },
-  { icon: MessageSquare, value: '15,000+', label: 'Messaggi generati' },
   { icon: BarChart3, value: '8', label: 'Subreddit monitorati' },
+  { icon: Users, value: '1,000+', label: 'Post cercano un freelancer ogni giorno' },
+  { icon: MessageSquare, value: 'Sei tu?', label: 'La maggior parte non riceve risposta' },
 ]
 
 export default function HomePage() {
