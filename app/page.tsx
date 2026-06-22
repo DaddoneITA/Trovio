@@ -69,9 +69,9 @@ export default function HomePage() {
 
             {/* Headline */}
             <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold tracking-tight mb-6 leading-[1.1]">
-              Trova clienti su Reddit{' '}
+              Trova persone che{' '}
               <span className="bg-gradient-to-r from-[var(--color-primary)] to-[var(--color-primary-light)] bg-clip-text text-transparent animate-gradient">
-                in tempo reale
+                stanno già cercando il tuo servizio
               </span>
             </h1>
 
