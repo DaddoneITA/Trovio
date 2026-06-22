@@ -292,10 +292,10 @@ export default function HomePage() {
             <div>
               <h2 className="text-2xl sm:text-3xl font-bold mb-4">Perché ho creato Trovio</h2>
               <p className="text-[var(--color-text-secondary)] leading-relaxed mb-4">
-                Ho creato Trovio dopo tre mesi su Fiverr senza ricevere un solo messaggio. Avevo un profilo curato, prezzi competitivi, un portfolio solido — ma stavo solo aspettando. Il problema era che su Fiverr non hai controllo: sei uno tra migliaia.
+                Ho creato Trovio dopo tre mesi su Fiverr senza ricevere un solo messaggio. Avevo un profilo curato, prezzi competitivi, un portfolio solido, ma stavo solo aspettando. Il problema era che su Fiverr non hai controllo: sei uno tra migliaia.
               </p>
               <p className="text-[var(--color-text-secondary)] leading-relaxed mb-6">
-                Poi ho iniziato a cercare manualmente nelle community online e ho capito che ogni giorno centinaia di persone pubblicano richieste specifiche alla ricerca di professionisti. Trovio nasce per rendere queste opportunità immediatamente accessibili — senza ore di ricerca manuale.
+                Poi ho iniziato a cercare manualmente nelle community online e ho capito che ogni giorno centinaia di persone pubblicano richieste specifiche alla ricerca di professionisti. Trovio nasce per rendere queste opportunità immediatamente accessibili, senza ore di ricerca manuale.
               </p>
               <p className="font-semibold text-[var(--color-text)]">Luca Corazzi — Founder di Trovio</p>
             </div>
